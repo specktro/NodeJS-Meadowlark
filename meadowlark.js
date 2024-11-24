@@ -2,15 +2,25 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
 
+app.get('/', (req, res) => {
+    res.type('text/plain')
+    res.send('Meadowlark Travel')
+})
+
+app.get('/about', (req, res) => {
+    res.type('text/plain');
+    res.send('About Meadowlark Travel')
+})
+
 // Custom 404 page
 app.use((req, res) => {
-    res.type('text/plain');
+    res.type('text/plain')
     res.status(404)
     res.send('404 - Not Found')
 })
 
 // Custom 500 page
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
     console.error(err.message)
     res.type('text/plain')
     res.status(500)
@@ -18,6 +28,6 @@ app.use((err, req, res, next) => {
 })
 
 app.listen(port, () => console.log(
-    `Express started on http://localhost:${port};` +
+    `Express started on http://localhost:${port}; ` +
     `press Ctrl-C to terminate.`
 ))
