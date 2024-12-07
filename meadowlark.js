@@ -1,10 +1,12 @@
 const express = require('express')
 const expressHandlebars= require('express-handlebars')
 const bodyParser = require('body-parser')
-const app = express()
+const multiparty = require('multiparty')
 const port = process.env.PORT || 3000
 
 const handlers = require('./lib/handlers')
+
+const app = express()
 
 // configure Handlebars view engine
 app.engine('handlebars', expressHandlebars.engine({
@@ -31,6 +33,30 @@ app.get('/newsletter-signup/thank-you', handlers.newsletterSignupThankYou)
 
 app.get('/newsletter', handlers.newsletter)
 app.post('/api/newsletter-signup', handlers.api.newsletterSignup)
+
+app.get('/contest/vacation-photo', handlers.vacationPhotoContest)
+app.post('/contest/vacation-photo/:year/:month', (req, res) => {
+    const form = new multiparty.Form()
+    form.parse(req, (err, fields, files) => {
+        if (err) {
+            return res.status(500).send({error: err.message})
+        }
+
+        handlers.vacationPhotoContestProcess(req, res, fields, files)
+    })
+})
+app.get('/contest/vacation-photo-ajax', handlers.vacationPhotoContestAjax)
+app.post('/api/vacation-photo-contest/:year/:month', (req, res) => {
+    const form = new multiparty.Form()
+    form.parse(req, (err, fields, files) => {
+        if (err) {
+            res.status(500).send({error: err.message})
+        }
+
+        handlers.api.vacationPhotoContest(req, res, fields, files)
+    })
+})
+app.get('/contest/vacation-photo-thank-you', handlers.vacationPhotoContestProcessThankYou)
 
 // Custom 404 page
 app.use(handlers.notFound)
