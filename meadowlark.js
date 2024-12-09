@@ -2,6 +2,10 @@ const express = require('express')
 const expressHandlebars= require('express-handlebars')
 const bodyParser = require('body-parser')
 const multiparty = require('multiparty')
+const cookieParser= require('cookie-parser')
+const expressSession = require('express-session')
+const flashMiddleware = require('./lib/middleware/flash')
+const { credentials } = require('./config')
 const port = process.env.PORT || 3000
 
 const handlers = require('./lib/handlers')
@@ -22,6 +26,13 @@ app.engine('handlebars', expressHandlebars.engine({
 app.set('view engine', 'handlebars')
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
+app.use(cookieParser(credentials.cookieSecret))
+app.use(expressSession({
+    resave: false,
+    saveUninitialized: false,
+    secret: credentials.cookieSecret
+}))
+app.use(flashMiddleware)
 
 app.use(express.static(__dirname + '/public'))
 app.get('/', handlers.home)
